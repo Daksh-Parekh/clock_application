@@ -1,460 +1,868 @@
+// import 'dart:math';
+// import 'package:clock_app/views/screens/extension.dart';
+// import 'package:flutter/material.dart';
 
-import 'dart:math';
-import 'package:flutter/material.dart';
+// class Clockpage extends StatefulWidget {
+//   const Clockpage({super.key});
 
-class Clockpage extends StatefulWidget {
-  const Clockpage({super.key});
+//   @override
+//   State<Clockpage> createState() => _ClockpageState();
+// }
 
-  @override
-  State<Clockpage> createState() => _ClockpageState();
-}
+// class _ClockpageState extends State<Clockpage> {
+//   int h = 0, m = 0, s = 0;
+//   final minController = TextEditingController();
+//   final secController = TextEditingController();
+//   int usermin = 0;
+//   int usersec = 0;
+//   // startTimer() {
+//   //   Future.delayed(const Duration(seconds: 1), () {
+//   //     setState(() {
+//   //       s--;
+//   //       if (usersec > 0) {
+//   //         m--;
+//   //         s = 59;
+//   //       }
+//   //       if (usersec < 0 || usermin < 0) {
+//   //         startTimer();
+//   //       }
+//   //     });
+//   //   });
+//   // }
+//   void startTimer() {
+//     Future.delayed(const Duration(seconds: 1), () {
+//       usersec--;
+//       setState(() {
+//         if (usersec < 0) {
+//           usermin--;
+//           usersec = 59;
+//         }
+//         if (usersec > 0 || usermin > 0) {
+//           startTimer();
+//         }
+//       });
+//     });
+//   }
 
-class _ClockpageState extends State<Clockpage> {
-  
-  int h=0,m=0,s=0;
-  void startclock() {
-    h = DateTime.now().hour;
-    m = DateTime.now().minute;
-    s = DateTime.now().second;
-    setState(() {});
-    Future.delayed(
-      Duration(seconds: 1),
-      () {
-        startclock();
-      }
-    );
-  }
-  @override
-  void initState() {
-    startclock();
-    super.initState();
-  }
-  bool isAnalog = true;
-  bool isStrap = false;
-  bool isTimer = false;
-  bool isReverseTime = false;
-  @override
-  Widget build(BuildContext context) {
-    Size size = MediaQuery.sizeOf(context);
-    return Scaffold(
-      drawer:  Drawer(
-          child: Column(
-            children: [
-              UserAccountsDrawerHeader(
-                currentAccountPicture: CircleAvatar(
-                  foregroundImage: NetworkImage("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRS-bz3w3YbiCPW23zQNWR0sjH7WNZFmCV_6Q&s"),
-                ),
-                accountName: Text("User"),
-                accountEmail: Text("user@gmail.com"),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Analog"),
-                  Switch(
-                    value: isAnalog,
-                    onChanged: (val){
-                      isStrap = false;
-                      isTimer = false;
-                      isAnalog = val;
-                      setState(() {
-                      });
-                    },
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Strap"),
-                  Switch(
-                    value: isStrap,
-                    onChanged: (val){
-                      isAnalog = false;
-                      isTimer = false;
-                      isStrap = val;
-                      setState(() {
-                      });
-                    },
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Digital"),
-                  Switch(
-                    value: isTimer,
-                    onChanged: (val){
-                      isAnalog = false;
-                      isStrap = false;
-                      isTimer = val;
-                      setState(() {});
-                    },
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Reverse Timer"),
-                  Switch(
-                    value: isReverseTime,
-                    onChanged: (val){
-                      isAnalog = false;
-                      isStrap = false;
-                      isTimer = false;
-                      isReverseTime = val;
-                      setState(() {});
-                    },
-                  ),
-                ],
-              ),
-            ],
-           
-          ),
-        ),
-        
-      appBar: AppBar(
-        title: const Text("Clock demo"),
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          //Analog
-          Visibility(
-            visible: isAnalog,
-            child: Stack(
-            alignment: Alignment.center,
-              children: [
-                Container(
-                  width: size.width * 0.9,
-                  height: size.width * 0.9,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                  ),
-                  child: Image.network(
-                    'data:image/png;base64,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',
-                    fit: BoxFit.fitWidth,
-                  ),
-                ),
-                //Second
-                Transform.rotate(
-                  angle: s *(pi*2) /60,
-                  child: Transform.rotate(
-                    angle: pi/2,
-                    child: Divider(
-                      color: Colors.red,
-                      indent: 90,
-                      thickness: 2,
-                      endIndent: size.width * 0.5,//-16
-                    ),
-                  ),
-                ),
-                //Minute
-                Transform.rotate(
-                  angle: m *(pi*2) /60,
-                  child: Transform.rotate(
-                    angle: pi/2,
-                    child: Divider(
-                      color: Colors.black,
-                      indent: 110,
-                      thickness: 3,
-                      endIndent: size.width * 0.5 ,
-                    ),
-                  ),
-                ),
-                //Hour
-                Transform.rotate(
-                  angle: h *(pi*2) /12,
-                  child: Transform.rotate(
-                    angle: pi/2,
-                    child: Divider(
-                      color: Colors.black,
-                      indent: 160,
-                      thickness: 4,
-                      endIndent: size.width * 0.5 ,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ), 
-          //Strap
-          Center(
-            child: Visibility(
-              visible: isStrap,
-              child: Stack(
-              alignment: Alignment.center,
-                children: [
-                  //Second
-                  Transform.scale(
-                    scale: 6,                    
-                    child: CircularProgressIndicator(
-                      value: s/60,
-                      color: Colors.red,
-                      strokeWidth: 1,
-                    ),
-                  ),
-                  //Minute
-                  Transform.scale(
-                    scale: 5,
-                    child: CircularProgressIndicator(
-                      value: m/60,
-                      color: Colors.black45,
-                      strokeWidth: 3,
-                    ),
-                  ),
-                  //Hour
-                  Transform.scale(
-                    scale: 3.7,
-                    child: CircularProgressIndicator(
-                      value: (h%12)/12,
-                      color: Colors.black,
-                      strokeWidth: 6,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ), 
-          //Digital Timer
-          Visibility(
-            visible: isTimer,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                //Hour
-                Container(
-                  height: size.height * 0.12,
-                  width: size.width * 0.16,
-                  margin: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.black26,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey,
-                        blurRadius: 5,
-                        offset: Offset(5, 5),
-                      ),                      
-                    ],
-                  ),
-                  child: Center(
-                    child: Text(
-                      "${h%12}",
-                      style: TextStyle(
-                        fontSize: 40,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-                Column(
-                  children: [
-                    CircleAvatar(
-                      radius: 10,
-                      backgroundColor: Colors.black,
-                    ),
-                    Padding(padding: EdgeInsets.all(6)),
-                    CircleAvatar(
-                      radius: 10,
-                      backgroundColor: Colors.black,
-                    ),
-                  ],
-                ),
-                
-                //Minute
-                Container(
-                  height: size.height * 0.12,
-                  width: size.width * 0.16,
-                  margin: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.black26,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey,
-                        blurRadius: 5,
-                        offset: Offset(5, 5),
-                      ),                      
-                    ],
-                  ),
-                  child: Center(
-                    child: Text(
-                      "${m}",
-                      style: TextStyle(
-                        fontSize: 40,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-                Column(
-                  children: [
-                    CircleAvatar(
-                      radius: 10,
-                      backgroundColor: Colors.black,
-                    ),
-                    Padding(padding: EdgeInsets.all(6)),
-                    CircleAvatar(
-                      radius: 10,
-                      backgroundColor: Colors.black,
-                    ),
-                  ],
-                ),
-                //Second
-                Container(
-                  height: size.height * 0.12,
-                  width: size.width * 0.16,
-                  margin: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.black26,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey,
-                        blurRadius: 5,
-                        offset: Offset(5, 5),
-                      ),                      
-                    ],
-                  ),
-                  child: Center(
-                    child: Text(
-                      "${s}",
-                      style: TextStyle(
-                        fontSize: 40,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-                // Text("${m}",),
-                // Text(":",),
-                // Text("${s}",),
-              ],
-            ),
-          ),
-          //Reverse Timer
-          
-        ],
-      ),
-    );
-  }
-}
+//   void startclock() {
+//     h = DateTime.now().hour;
+//     m = DateTime.now().minute;
+//     s = DateTime.now().second;
+//     setState(() {});
+//     Future.delayed(Duration(seconds: 1), () {
+//       startclock();
+//     });
+//   }
 
-        // child: Align(
-        //   child: Stack(
-        //     alignment: Alignment.center,
-        //     children: [
-        //       //Second
-        //       Transform.rotate(
-        //         angle: s*(pi*2)/60,
-        //         child: Transform.rotate(
-        //           angle: pi/2,
-        //           child: Divider(
-        //             color: Colors.red,
-        //             thickness: 3,
-        //             indent: 50,
-        //             endIndent: size.width *0.5,
-        //           ),
-        //         ),
-        //       ),
-        //       //Minute
-        //       Transform.rotate(
-        //         angle: m*(pi*2)/60,
-        //         child: Transform.rotate(
-        //           angle: pi/2,
-        //           child: Divider(
-        //             color: Colors.black,
-        //             thickness: 3,
-        //             indent: 40,
-        //             endIndent: size.width *0.5,
-        //           ),
-        //         ),
-        //       ),
-        //       //Hour
-        //       Transform.rotate(
-        //         angle: h*(pi*2)/12,
-        //         child: Transform.rotate(
-        //           angle: pi/2,
-        //           child: Divider(
-        //             color: Colors.black,
-        //             thickness: 6,
-        //             indent: 60,
-        //             endIndent: size.width *0.5,
-        //           ),
-        //         ),
-        //       ),
-        //     ],
-        //   ),
-        // ),
-      
+//   int min = 0, sec = 0;
+//   bool isrunn = true;
+//   bool ispause = false;
+//   void StartStopWatch() {
+//     isrunn = true;
+//     // ispause = true;
+//     Future.delayed((Duration(seconds: 1)), () {
+//       if (isrunn && ispause) {
+//         setState(() {
+//           sec++;
+//           if (sec >= 60) {
+//             min++;
+//             sec = 0;
+//           }
+//           StartStopWatch();
+//           // ispause = !ispause;
+//         });
+//       }
+//     });
+//   }
 
-    // int x =10;
-    // int y = 10;
-    // child: Center(
-    //       child: Column(
-    //         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-    //         children: [
-    //           LinearProgressIndicator(),              
-    //           Transform.scale(
-    //             scaleX: 4,
-    //             child: CircularProgressIndicator(
-    //               value: 1,
-    //             ),
-    //           ),
-    //           Transform.translate(
-    //             offset: Offset(x.toDouble(), y.toDouble()),
-    //             child: CircularProgressIndicator()
-    //           ),
-    //           Transform.rotate(
-    //             angle: 0,
-    //             child: Divider(
-    //               color: Colors.black,
-    //               thickness: 3,
-    //               indent: 50,
-    //               endIndent: MediaQuery.sizeOf(context).width * 0.5 - 16
-    //             ),
-    //           ),
-    //         ],            
-    //       ),
-    //     ),
-    
-    // floatingActionButton: Row(
-    //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-    //   children: [
-    //     FloatingActionButton(
-    //       onPressed: () {
-    //         y -= 10;
-    //         setState(() {});
-    //       },
-    //       child: Icon(Icons.arrow_upward_rounded),
-    //     ),
-    //     FloatingActionButton(
-    //       onPressed: () {
-    //         y += 10;
-    //         setState(() {});
-    //       },
-    //       child: Icon(Icons.arrow_downward_rounded),
-    //     ),
-    //     FloatingActionButton(
-    //       onPressed: () {
-    //         x -= 10;
-    //         setState(() {});
-    //       },
-    //       child: Icon(Icons.arrow_back_rounded),
-    //     ),
-    //     FloatingActionButton(
-    //       onPressed: () {
-    //         x += 10;
-    //         setState(() {});
-    //       },
-    //       child: Icon(Icons.arrow_forward_rounded),
-    //     ),
-    //   ],
-    // ),
-  
+//   void resetStopWatch() {
+//     min = 0;
+//     sec = 0;
+//     laps.clear();
+//     setState(() {});
+//     ispause = false;
+//     isrunn = false;
+//   }
+
+//   List laps = [];
+//   void addLap() {
+//     laps.add(min.toString() + ':' + sec.toString().padLeft(2, '0'));
+//     setState(() {});
+//   }
+
+//   @override
+//   void initState() {
+//     startclock();
+//     currentDial = dials[0];
+//     super.initState();
+//   }
+
+//   bool isAnalog = false;
+//   bool isStrap = false;
+//   bool isTimer = false;
+//   bool isReverseTime = false;
+//   bool isStopWatch = true;
+//   String currentDial = "";
+
+//   List<String> dials = [
+//     'lib/assets/images/dial1.png',
+//     'lib/assets/images/dial2.jpg',
+//     'lib/assets/images/dial3.png',
+//     'lib/assets/images/dial4.png',
+//     'lib/assets/images/blackdial.png',
+//   ];
+
+//   @override
+//   Widget build(BuildContext context) {
+//     Size size = MediaQuery.sizeOf(context);
+
+//     return Scaffold(
+//       backgroundColor: Colors.white,
+//       drawer: Drawer(
+//         child: Column(
+//           children: [
+//             UserAccountsDrawerHeader(
+//               currentAccountPicture: CircleAvatar(
+//                 foregroundImage: NetworkImage(
+//                     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRS-bz3w3YbiCPW23zQNWR0sjH7WNZFmCV_6Q&s"),
+//               ),
+//               accountName: Text("User"),
+//               accountEmail: Text("user@gmail.com"),
+//             ),
+//             Padding(
+//               padding: const EdgeInsets.only(left: 16),
+//               child: Row(
+//                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                 children: [
+//                   Text("Analog"),
+//                   Switch(
+//                     value: isAnalog,
+//                     onChanged: (val) {
+//                       isStrap = false;
+//                       isTimer = false;
+//                       isReverseTime = false;
+//                       isStopWatch = false;
+//                       isAnalog = val;
+//                       setState(() {});
+//                     },
+//                   ),
+//                 ],
+//               ),
+//             ),
+//             Visibility(
+//               visible: isAnalog,
+//               child: Column(
+//                 children: [
+//                   Text(
+//                     "Slect Dial",
+//                     style: TextStyle(
+//                       fontSize: 20,
+//                       fontWeight: FontWeight.bold,
+//                     ),
+//                   ),
+//                   SingleChildScrollView(
+//                     scrollDirection: Axis.horizontal,
+//                     child: Row(
+//                       mainAxisSize: MainAxisSize.min,
+//                       children: dials
+//                           .map(
+//                             (e) => GestureDetector(
+//                               onTap: () {
+//                                 currentDial = e;
+//                                 setState(() {});
+//                               },
+//                               child: Container(
+//                                 height: 100,
+//                                 width: 100,
+//                                 padding: EdgeInsets.all(8),
+//                                 margin: EdgeInsets.only(
+//                                   right: 8,
+//                                   top: 8,
+//                                   bottom: 8,
+//                                 ),
+//                                 decoration: BoxDecoration(
+//                                   image: DecorationImage(image: AssetImage(e)),
+//                                   border: e == currentDial
+//                                       ? Border.all(
+//                                           width: 5,
+//                                           strokeAlign: 0.8,
+//                                           color: Colors.purple,
+//                                         )
+//                                       : null,
+//                                   borderRadius: BorderRadius.circular(10),
+//                                 ),
+//                               ),
+//                             ),
+//                           )
+//                           .toList(),
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//             ),
+//             Row(
+//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//               children: [
+//                 Text("Strap"),
+//                 Switch(
+//                   value: isStrap,
+//                   onChanged: (val) {
+//                     isAnalog = false;
+//                     isTimer = false;
+//                     isReverseTime = false;
+//                     isStopWatch = false;
+//                     isStrap = val;
+//                     setState(() {});
+//                   },
+//                 ),
+//               ],
+//             ),
+//             Row(
+//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//               children: [
+//                 Text("Digital"),
+//                 Switch(
+//                   value: isTimer,
+//                   onChanged: (val) {
+//                     isAnalog = false;
+//                     isStrap = false;
+//                     isReverseTime = false;
+//                     isStopWatch = false;
+//                     isTimer = val;
+//                     setState(() {});
+//                   },
+//                 ),
+//               ],
+//             ),
+//             Row(
+//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//               children: [
+//                 Text("Reverse Timer"),
+//                 Switch(
+//                   value: isReverseTime,
+//                   onChanged: (val) {
+//                     isAnalog = false;
+//                     isStrap = false;
+//                     isTimer = false;
+//                     isStopWatch = false;
+//                     isReverseTime = val;
+//                     setState(() {});
+//                   },
+//                 ),
+//               ],
+//             ),
+//             Row(
+//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//               children: [
+//                 Text("Stop wATCH"),
+//                 Switch(
+//                   value: isStopWatch,
+//                   onChanged: (val) {
+//                     isStopWatch = true;
+//                     isAnalog = false;
+//                     isTimer = false;
+//                     isStrap = false;
+//                     isReverseTime = false;
+
+//                     isStopWatch = val;
+//                     setState(() {});
+//                   },
+//                 ),
+//               ],
+//             ),
+//           ],
+//         ),
+//       ),
+//       appBar: AppBar(
+//         backgroundColor: Colors.white,
+//         title: const Text("Clock demo"),
+//       ),
+//       body: Column(
+//         mainAxisAlignment: MainAxisAlignment.center,
+//         children: [
+//           //Analog
+//           Visibility(
+//             visible: isAnalog,
+//             child: Stack(
+//               alignment: Alignment.center,
+//               children: [
+//                 Container(
+//                   width: size.width * 0.9,
+//                   height: size.height * 0.7,
+//                   decoration: BoxDecoration(
+//                     shape: BoxShape.rectangle,
+//                     image: DecorationImage(
+//                       image: AssetImage(currentDial),
+//                       fit: BoxFit.contain,
+//                     ),
+//                   ),
+//                 ),
+//                 //Second
+//                 Transform.rotate(
+//                   angle: s * (pi * 2) / 60,
+//                   child: Transform.rotate(
+//                     angle: pi / 2,
+//                     child: Divider(
+//                       color: Colors.red,
+//                       indent: 70,
+//                       thickness: 3,
+//                       endIndent: size.width * 0.5, //-16
+//                     ),
+//                     // child: Image.network(
+//                     //   'https://w7.pngwing.com/pngs/691/968/png-transparent-clock-face-minute-clock-hand-monochrome-time.png',
+//                     //   height: size.width * 0.5, // Adjust the size as needed
+//                     //   fit: BoxFit.contain,
+//                     //   alignment: Alignment.topCenter, // Align image top center
+//                     // ),
+//                   ),
+//                 ),
+//                 //Minute
+//                 Transform.rotate(
+//                   angle: m * (pi * 2) / 60,
+//                   child: Transform.rotate(
+//                     angle: pi / 2,
+//                     child: Divider(
+//                       color: currentDial == 'lib/assets/images/blackdial.png'
+//                           ? Colors.white
+//                           : Colors.black,
+//                       indent: 85,
+//                       thickness: 5,
+//                       endIndent: size.width * 0.5,
+//                     ),
+//                   ),
+//                 ),
+//                 //Hour
+//                 Transform.rotate(
+//                   angle: h * (pi * 2) / 12,
+//                   child: Transform.rotate(
+//                     angle: pi / 2,
+//                     child: Divider(
+//                       color: currentDial == 'lib/assets/images/blackdial.png'
+//                           ? Colors.white
+//                           : Colors.black,
+//                       indent: 155,
+//                       thickness: 6,
+//                       endIndent: size.width * 0.5,
+//                     ),
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//           //Strap
+//           Center(
+//             child: Visibility(
+//               visible: isStrap,
+//               child: Stack(
+//                 alignment: Alignment.center,
+//                 children: [
+//                   //Second
+//                   Transform.scale(
+//                     scale: 3.7,
+//                     child: CircularProgressIndicator(
+//                       value: s / 60,
+//                       color: Colors.red,
+//                       strokeWidth: 1,
+//                     ),
+//                   ),
+//                   //Minute
+//                   Transform.scale(
+//                     scale: 5,
+//                     child: CircularProgressIndicator(
+//                       value: m / 60,
+//                       color: Colors.black45,
+//                       strokeWidth: 2,
+//                     ),
+//                   ),
+//                   //Hour
+//                   Transform.scale(
+//                     scale: 6,
+//                     child: CircularProgressIndicator(
+//                       value: (h % 12) / 12,
+//                       color: Colors.black,
+//                       strokeWidth: 2,
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//             ),
+//           ),
+//           //Digital Timer
+//           Visibility(
+//             visible: isTimer,
+//             child: Row(
+//               mainAxisAlignment: MainAxisAlignment.center,
+//               children: [
+//                 //Hour
+//                 Container(
+//                   height: size.height * 0.12,
+//                   width: size.width * 0.16,
+//                   margin: EdgeInsets.all(16),
+//                   decoration: BoxDecoration(
+//                     color: Colors.black26,
+//                     borderRadius: BorderRadius.circular(10),
+//                     boxShadow: [
+//                       BoxShadow(
+//                         color: Colors.grey,
+//                         blurRadius: 5,
+//                         offset: Offset(5, 5),
+//                       ),
+//                     ],
+//                   ),
+//                   child: Center(
+//                     child: Text(
+//                       "${h % 12}",
+//                       style: TextStyle(
+//                         fontSize: 40,
+//                         fontWeight: FontWeight.bold,
+//                         color: Colors.white,
+//                       ),
+//                     ),
+//                   ),
+//                 ),
+//                 Column(
+//                   children: [
+//                     CircleAvatar(
+//                       radius: 10,
+//                       backgroundColor: Colors.black,
+//                     ),
+//                     Padding(padding: EdgeInsets.all(6)),
+//                     CircleAvatar(
+//                       radius: 10,
+//                       backgroundColor: Colors.black,
+//                     ),
+//                   ],
+//                 ),
+
+//                 //Minute
+//                 Container(
+//                   height: size.height * 0.12,
+//                   width: size.width * 0.16,
+//                   margin: EdgeInsets.all(16),
+//                   decoration: BoxDecoration(
+//                     color: Colors.black26,
+//                     borderRadius: BorderRadius.circular(10),
+//                     boxShadow: [
+//                       BoxShadow(
+//                         color: Colors.grey,
+//                         blurRadius: 5,
+//                         offset: Offset(5, 5),
+//                       ),
+//                     ],
+//                   ),
+//                   child: Center(
+//                     child: Text(
+//                       "${m}",
+//                       style: TextStyle(
+//                         fontSize: 40,
+//                         fontWeight: FontWeight.bold,
+//                         color: Colors.white,
+//                       ),
+//                     ),
+//                   ),
+//                 ),
+//                 Column(
+//                   children: [
+//                     CircleAvatar(
+//                       radius: 10,
+//                       backgroundColor: Colors.black,
+//                     ),
+//                     Padding(padding: EdgeInsets.all(6)),
+//                     CircleAvatar(
+//                       radius: 10,
+//                       backgroundColor: Colors.black,
+//                     ),
+//                   ],
+//                 ),
+//                 //Second
+//                 Container(
+//                   height: size.height * 0.12,
+//                   width: size.width * 0.16,
+//                   margin: EdgeInsets.all(16),
+//                   decoration: BoxDecoration(
+//                     color: Colors.black26,
+//                     borderRadius: BorderRadius.circular(10),
+//                     boxShadow: [
+//                       BoxShadow(
+//                         color: Colors.grey,
+//                         blurRadius: 5,
+//                         offset: Offset(5, 5),
+//                       ),
+//                     ],
+//                   ),
+//                   child: Center(
+//                     child: Text(
+//                       "${s}",
+//                       style: TextStyle(
+//                         fontSize: 40,
+//                         fontWeight: FontWeight.bold,
+//                         color: Colors.white,
+//                       ),
+//                     ),
+//                   ),
+//                 ),
+//                 // Text("${m}",),
+//                 // Text(":",),
+//                 // Text("${s}",),
+//               ],
+//             ),
+//           ),
+//           //Reverse Timer
+//           Visibility(
+//             visible: isReverseTime,
+//             child: Column(
+//               mainAxisAlignment: MainAxisAlignment.center,
+//               children: [
+//                 Container(
+//                   height: size.height * 0.4,
+//                   width: size.width * 0.4,
+//                   decoration: BoxDecoration(
+//                     color: Colors.white,
+//                     // shape: BoxShape.circle,
+//                     border: Border.all(
+//                       color: Colors.black.withOpacity(0.6),
+//                       width: 4,
+//                     ),
+//                   ),
+//                   child: Row(
+//                     mainAxisAlignment: MainAxisAlignment.center,
+//                     children: [
+//                       Text(
+//                         "$usermin".padLeft(2, '0'),
+//                         style: TextStyle(
+//                           fontSize: 50,
+//                           fontWeight: FontWeight.bold,
+//                         ),
+//                       ),
+//                       8.w,
+//                       Text(
+//                         ":",
+//                         style: TextStyle(
+//                           fontSize: 50,
+//                           fontWeight: FontWeight.bold,
+//                         ),
+//                       ),
+//                       8.w,
+//                       Text(
+//                         "$usersec".padLeft(2, '0'),
+//                         style: TextStyle(
+//                           fontSize: 50,
+//                           fontWeight: FontWeight.bold,
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//                 20.h,
+//                 Row(
+//                   mainAxisAlignment: MainAxisAlignment.center,
+//                   children: [
+//                     SizedBox(
+//                       width: 100,
+//                       child: TextField(
+//                         controller: minController,
+//                         decoration: InputDecoration(
+//                           hintText: 'Minutes',
+//                           border: OutlineInputBorder(),
+//                         ),
+//                       ),
+//                     ),
+//                     20.w,
+//                     SizedBox(
+//                       width: 100,
+//                       child: TextField(
+//                         controller: secController,
+//                         decoration: InputDecoration(
+//                           hintText: 'Seconds',
+//                           border: OutlineInputBorder(),
+//                         ),
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//                 20.h,
+//                 ElevatedButton(
+//                   onPressed: () {
+//                     setState(() {
+//                       usermin = int.tryParse(minController.text) ?? 0;
+//                       usersec = int.tryParse(secController.text) ?? 0;
+//                       startTimer();
+//                     });
+//                   },
+//                   child: Text("Start"),
+//                 ),
+
+//                 // GestureDetector(
+//                 //   onTap: () {
+//                 //     setState(() {
+//                 //       usersec = int.parse(secController.text);
+//                 //       usermin = int.parse(minController.text);
+//                 //       startTimer();
+//                 //     });
+//                 //   },
+//                 //   child: Text("Start Timer"),
+//                 // ),
+//                 // MaterialButton(
+//                 //   onPressed: () {},
+//                 //   color: Colors.black,
+//                 //   child: Text(
+//                 //     "Start Timer",
+//                 //     style: TextStyle(color: Colors.white),
+//                 //   ),
+//                 // ),
+//               ],
+//             ),
+//           ),
+//           //Stop Watch
+//           Visibility(
+//             visible: isStopWatch,
+//             child: Column(
+//               children: [
+//                 Container(
+//                   height: size.height * 0.5,
+//                   width: size.width * 0.55,
+//                   // alignment: Alignment.center,
+//                   decoration: BoxDecoration(
+//                     color: Colors.white,
+//                     shape: BoxShape.circle,
+//                     border: Border.all(
+//                       color: Colors.black.withOpacity(0.6),
+//                       width: 4,
+//                     ),
+//                     boxShadow: [
+//                       BoxShadow(
+//                         color: Colors.indigo.withOpacity(0.8),
+//                         blurRadius: 5,
+//                         offset: Offset(4, 5),
+//                       ),
+//                       BoxShadow(
+//                         color: Colors.indigo.withOpacity(0.4),
+//                         blurRadius: 5,
+//                         offset: Offset(-3, -5),
+//                       ),
+//                     ],
+//                   ),
+//                   child: Column(
+//                     mainAxisAlignment: MainAxisAlignment.center,
+//                     children: [
+//                       Text(
+//                         "${min.toString().padLeft(2, '0')} : ${sec.toString().padLeft(2, '0')}",
+//                         style: TextStyle(
+//                           fontSize: 38,
+//                           fontWeight: FontWeight.w500,
+//                           color: Colors.black,
+//                         ),
+//                       ),
+//                       Row(
+//                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//                         children: [
+//                           Text(
+//                             "min\t",
+//                             style: TextStyle(
+//                               fontSize: 20,
+//                               color: Colors.grey.shade500,
+//                             ),
+//                           ),
+//                           Text(
+//                             "sec",
+//                             style: TextStyle(
+//                               fontSize: 20,
+//                               color: Colors.grey.shade500,
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//                 Row(
+//                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//                   children: [
+//                     ElevatedButton(
+//                       onPressed: () {
+//                         // if (isrunn && ispause) {
+//                         StartStopWatch();
+
+//                         ispause = !ispause;
+//                         // ispause = false;
+//                       },
+//                       child: !ispause ? Text("Start") : Text("Pause"),
+//                     ),
+//                     //10.w,
+//                     Container(
+//                       height: size.height * 0.1,
+//                       width: size.width * 0.1,
+//                       alignment: Alignment.center,
+//                       decoration: BoxDecoration(
+//                         shape: BoxShape.circle,
+//                         color: Colors.blue,
+//                       ),
+//                       child: IconButton(
+//                         onPressed: () {
+//                           addLap();
+//                         },
+//                         icon: Icon(
+//                           Icons.flag_rounded,
+//                           color: Colors.white,
+//                         ),
+//                       ),
+//                     ),
+
+//                     ElevatedButton(
+//                       onPressed: () {
+//                         resetStopWatch();
+//                       },
+//                       child: Text("Stop"),
+//                     ),
+//                   ],
+//                 ),
+//                 Container(
+//                   padding: EdgeInsets.all(16),
+//                   color: Colors.white,
+//                   height: double.infinity,
+//                   width: double.infinity,
+//                   alignment: Alignment.centerLeft,
+//                   child: SingleChildScrollView(
+//                     child: Column(
+//                       children: List.generate(
+//                         laps.length,
+//                         (index) => Row(
+//                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                           children: [
+//                             Text(
+//                               "# ${index + 1}  Lap",
+//                               style: TextStyle(
+//                                 fontSize: 16,
+//                               ),
+//                             ),
+//                             Text(
+//                               "${laps[index]}",
+//                               style: TextStyle(
+//                                 fontSize: 16,
+//                               ),
+//                             )
+//                           ],
+//                         ),
+//                       ),
+//                     ),
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+// // child: Align(
+// //   child: Stack(
+// //     alignment: Alignment.center,
+// //     children: [
+// //       //Second
+// //       Transform.rotate(
+// //         angle: s*(pi*2)/60,
+// //         child: Transform.rotate(
+// //           angle: pi/2,
+// //           child: Divider(
+// //             color: Colors.red,
+// //             thickness: 3,
+// //             indent: 50,
+// //             endIndent: size.width *0.5,
+// //           ),
+// //         ),
+// //       ),
+// //       //Minute
+// //       Transform.rotate(
+// //         angle: m*(pi*2)/60,
+// //         child: Transform.rotate(
+// //           angle: pi/2,
+// //           child: Divider(
+// //             color: Colors.black,
+// //             thickness: 3,
+// //             indent: 40,
+// //             endIndent: size.width *0.5,
+// //           ),
+// //         ),
+// //       ),
+// //       //Hour
+// //       Transform.rotate(
+// //         angle: h*(pi*2)/12,
+// //         child: Transform.rotate(
+// //           angle: pi/2,
+// //           child: Divider(
+// //             color: Colors.black,
+// //             thickness: 6,
+// //             indent: 60,
+// //             endIndent: size.width *0.5,
+// //           ),
+// //         ),
+// //       ),
+// //     ],
+// //   ),
+// // ),
+
+// // int x =10;
+// // int y = 10;
+// // child: Center(
+// //       child: Column(
+// //         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+// //         children: [
+// //           LinearProgressIndicator(),
+// //           Transform.scale(
+// //             scaleX: 4,
+// //             child: CircularProgressIndicator(
+// //               value: 1,
+// //             ),
+// //           ),
+// //           Transform.translate(
+// //             offset: Offset(x.toDouble(), y.toDouble()),
+// //             child: CircularProgressIndicator()
+// //           ),
+// //           Transform.rotate(
+// //             angle: 0,
+// //             child: Divider(
+// //               color: Colors.black,
+// //               thickness: 3,
+// //               indent: 50,
+// //               endIndent: MediaQuery.sizeOf(context).width * 0.5 - 16
+// //             ),
+// //           ),
+// //         ],
+// //       ),
+// //     ),
+
+// // floatingActionButton: Row(
+// //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+// //   children: [
+// //     FloatingActionButton(
+// //       onPressed: () {
+// //         y -= 10;
+// //         setState(() {});
+// //       },
+// //       child: Icon(Icons.arrow_upward_rounded),
+// //     ),
+// //     FloatingActionButton(
+// //       onPressed: () {
+// //         y += 10;
+// //         setState(() {});
+// //       },
+// //       child: Icon(Icons.arrow_downward_rounded),
+// //     ),
+// //     FloatingActionButton(
+// //       onPressed: () {
+// //         x -= 10;
+// //         setState(() {});
+// //       },
+// //       child: Icon(Icons.arrow_back_rounded),
+// //     ),
+// //     FloatingActionButton(
+// //       onPressed: () {
+// //         x += 10;
+// //         setState(() {});
+// //       },
+// //       child: Icon(Icons.arrow_forward_rounded),
+// //     ),
+// //   ],
+// // ),
